@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 
 // NFT Contract details
-const NFT_CONTRACT_ADDRESS = "0x24c4b1Ee73f8391d09C50Cb46a898572ACE580Bf";
+const NFT_CONTRACT_ADDRESS = "0x7dE30C509208674E6a20D450cA04fEcac5daAD68";
 const NFT_ABI = [
   {
     inputs: [],

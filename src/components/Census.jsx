@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { useState } from 'react';
 import { useUser } from '../context/UserContext';
 import { mintNFT, getSepoliaEth } from '../utils/mintNFT';
+import MintSuccess from './MintSuccess';
 
 const CensusContainer = styled.div`
   max-width: 600px;
@@ -154,6 +155,8 @@ const Census = ({ onComplete }) => {
   const [mintError, setMintError] = useState('');
   const [isDiscounted, setIsDiscounted] = useState(false);
   const [discountAddress, setDiscountAddress] = useState('');
+  const [mintSuccess, setMintSuccess] = useState(false);
+  const [mintData, setMintData] = useState(null);
 
   const handleSolanaSubmit = () => {
     // Simply move to next step
@@ -166,20 +169,15 @@ const Census = ({ onComplete }) => {
   };
 
   const handleNFTMint = async () => {
-    setMinting(true);
-    setMintError('');
-
     try {
+      setMinting(true);
+      setMintError(null);
       const result = await mintNFT();
-      
       if (result.success) {
-        console.log('NFT minted:', result);
-        onComplete();
-      } else {
-        setMintError(result.error);
+        setMintData(result);
+        setMintSuccess(true);
       }
     } catch (error) {
-      console.error('Minting error:', error);
       setMintError(error.message);
     } finally {
       setMinting(false);
@@ -388,6 +386,13 @@ const Census = ({ onComplete }) => {
             }}>
               {mintError}
             </div>
+          )}
+
+          {mintSuccess && (
+            <MintSuccess 
+              tokenId={mintData.tokenId}
+              transactionHash={mintData.transaction}
+            />
           )}
         </StepContainer>
       )}
