@@ -1,0 +1,15 @@
+{
+    "name": "GENIS AI Pass",
+    "description": "GENIS AI Community Pass",
+    "image": "https://raw.githubusercontent.com/YOUR_GITHUB/REPO/main/genis-pass.png",
+    "attributes": [
+        {
+            "trait_type": "Type",
+            "value": "Community Pass"
+        },
+        {
+            "trait_type": "Access Level",
+            "value": "Member"
+        }
+    ]
+} 
