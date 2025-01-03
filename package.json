@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "@openzeppelin/contracts": "^5.1.0",
     "@solana/spl-token": "^0.4.9",
     "@solana/web3.js": "^1.98.0",
     "alchemy-sdk": "^3.5.0",
@@ -13,6 +15,7 @@
     "dotenv": "^16.4.7",
     "ethers": "^5.7.2",
     "express": "^4.21.2",
+    "hardhat": "^2.22.17",
     "openai": "^4.77.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

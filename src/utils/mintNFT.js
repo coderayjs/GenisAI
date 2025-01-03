@@ -1,12 +1,17 @@
 import { Network, Alchemy } from 'alchemy-sdk';
+import { ethers } from 'ethers';
 
-// Configure Alchemy SDK
-const settings = {
-  apiKey: "YOUR_ALCHEMY_API_KEY", // Replace with your Alchemy API key
-  network: Network.ETH_SEPOLIA, // Using Sepolia testnet
-};
+// NFT Contract details
+const NFT_CONTRACT_ADDRESS = "YOUR_CONTRACT_ADDRESS";
+const NFT_ABI = [
+  "function mint(address to) public",
+  "function balanceOf(address owner) view returns (uint256)",
+  "function tokenOfOwnerByIndex(address owner, uint256 index) view returns (uint256)"
+];
 
-const alchemy = new Alchemy(settings);
+// Sepolia network configuration
+const SEPOLIA_RPC = "https://eth-sepolia.g.alchemy.com/v2/rLKuFcZ7fSvflknt123WR-y4CSqnPB83";
+const CHAIN_ID = 11155111; // Sepolia chain ID
 
 export const mintNFT = async () => {
   try {
@@ -14,36 +19,59 @@ export const mintNFT = async () => {
       throw new Error('Please install MetaMask');
     }
 
-    // Get the wallet address
+    // Request network switch to Sepolia
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: `0x${CHAIN_ID.toString(16)}` }],
+      });
+    } catch (switchError) {
+      // Handle chain switch error
+      if (switchError.code === 4902) {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: `0x${CHAIN_ID.toString(16)}`,
+            chainName: 'Sepolia Testnet',
+            nativeCurrency: {
+              name: 'Sepolia ETH',
+              symbol: 'SEP',
+              decimals: 18
+            },
+            rpcUrls: [SEPOLIA_RPC],
+            blockExplorerUrls: ['https://sepolia.etherscan.io']
+          }]
+        });
+      } else {
+        throw switchError;
+      }
+    }
+
+    // Create provider and signer
+    const provider = new ethers.providers.JsonRpcProvider(SEPOLIA_RPC);
+    const signer = provider.getSigner();
+
+    // Create contract instance
+    const nftContract = new ethers.Contract(
+      NFT_CONTRACT_ADDRESS,
+      NFT_ABI,
+      signer
+    );
+
+    // Get accounts
     const accounts = await window.ethereum.request({
       method: 'eth_requestAccounts'
     });
     const userAddress = accounts[0];
 
-    // NFT Metadata
-    const nftMetadata = {
-      name: "GENIS Pass",
-      description: "GENIS Community Access Pass",
-      image: "YOUR_NFT_IMAGE_URL", // Replace with your NFT image URL
-      attributes: [
-        {
-          trait_type: "Type",
-          value: "Community Pass"
-        }
-      ]
-    };
-
-    // Mint NFT using Alchemy
-    const transaction = await alchemy.nft.mintNft({
-      contract: "YOUR_CONTRACT_ADDRESS", // Replace with your NFT contract address
-      to: userAddress,
-      tokenUri: nftMetadata
-    });
+    // Mint NFT
+    const tx = await nftContract.mint(userAddress);
+    const receipt = await tx.wait();
 
     return {
       success: true,
-      transaction: transaction.hash,
-      tokenId: transaction.tokenId
+      transaction: receipt.transactionHash,
+      userAddress: userAddress
     };
 
   } catch (error) {
