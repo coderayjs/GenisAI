@@ -5,7 +5,15 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-app.use(cors());
+
+// Updated CORS configuration
+app.use(cors({
+  origin: 'https://genis-ai.vercel.app',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
+
 app.use(express.json());
 
 // Load API key from .env.local
@@ -16,6 +24,9 @@ const apiKey = envContent.match(/OPENAI_API_KEY=(.*)/)[1].trim();
 const openai = new OpenAI({
   apiKey: apiKey
 });
+
+// Add OPTIONS handler for preflight requests
+app.options('/api/generate-advice', cors());
 
 app.post('/api/generate-advice', async (req, res) => {
   try {
@@ -54,5 +65,4 @@ if (process.env.NODE_ENV !== 'production') {
   });
 }
 
-// For Vercel
 module.exports = app; 
