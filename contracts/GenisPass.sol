@@ -90,6 +90,6 @@ contract GenisPass is ERC721, Ownable {
 
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
         require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
-        return "https://raw.githubusercontent.com/YOUR_GITHUB/REPO/main/genis-pass.json";
+        return "https://raw.githubusercontent.com/coderayjs/GenisAI/master/genis-pass.json";
     }
 } 
