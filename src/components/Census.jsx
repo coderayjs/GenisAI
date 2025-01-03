@@ -1,8 +1,10 @@
 import styled from 'styled-components';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUser } from '../context/UserContext';
 import { mintNFT, getSepoliaEth } from '../utils/mintNFT';
 import MintSuccess from './MintSuccess';
+import MintInstructions from './MintInstructions';
+import UserHeader from './UserHeader';
 
 const CensusContainer = styled.div`
   max-width: 600px;
@@ -29,7 +31,7 @@ const Input = styled.input`
 
 const Button = styled.button`
   padding: 1rem 2rem;
-  background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+  background: linear-gradient(45deg, #DA498D, #FF8E53);
   color: white;
   border: none;
   border-radius: 50px;
@@ -57,7 +59,7 @@ const AsciiTitle = styled.pre`
   font-size: 0.7rem;
   line-height: 1.2;
   margin-bottom: 1rem;
-  color: #FF6B6B;
+  color: #DA498D;
   text-align: center;
 `;
 
@@ -69,54 +71,34 @@ const StepNumber = styled.h3`
 `;
 
 const ProgressBarContainer = styled.div`
-  position: relative;
+  width: 100%;
   margin: 2rem 0;
-  padding: 1rem;
-  
-  &::before {
-    content: '╔════════════════════════╗';
-    display: block;
-    font-family: monospace;
-    color: #FF6B6B;
-    margin-bottom: 0.5rem;
-  }
-  
-  &::after {
-    content: '╚════════════════════════╝';
-    display: block;
-    font-family: monospace;
-    color: #FF6B6B;
-    margin-top: 0.5rem;
-  }
 `;
 
 const ProgressBar = styled.div`
   width: 100%;
-  height: 12px;
-  background: #fff;
-  border-radius: 10px;
-  margin: 1rem 0;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
   overflow: hidden;
-  border: 2px solid transparent;
-  background-image: linear-gradient(white, white), 
-                    linear-gradient(45deg, #FF6B6B, #FF8E53);
-  background-origin: border-box;
-  background-clip: content-box, border-box;
   position: relative;
 `;
 
 const Progress = styled.div`
+  position: absolute;
+  left: 0;
+  top: 0;
   width: ${props => props.progress}%;
   height: 100%;
-  background: linear-gradient(45deg, #FF6B6B, #FF8E53);
-  transition: width 0.5s ease;
-  border-radius: 6px;
+  background: linear-gradient(45deg, #DA498D, #FF8E53);
+  border-radius: 2px;
+  transition: width 0.3s ease;
 `;
 
 const XPReward = styled.div`
   text-align: center;
   font-size: 2rem;
-  color: #FF6B6B;
+  color: #DA498D;
   margin: 2rem 0;
   animation: pulse 2s infinite;
   font-family: 'Montserrat', sans-serif;
@@ -141,6 +123,7 @@ const XPReward = styled.div`
 `;
 
 const Census = ({ onComplete }) => {
+  const { user, registerUser } = useUser();
   const [step, setStep] = useState(1);
   const [data, setData] = useState({
     solanaAddress: '',
@@ -148,7 +131,6 @@ const Census = ({ onComplete }) => {
     nftMinted: false
   });
   const [isCompleted, setIsCompleted] = useState(false);
-  const { registerUser } = useUser();
   const [verifying, setVerifying] = useState(false);
   const [verificationError, setVerificationError] = useState('');
   const [minting, setMinting] = useState(false);
@@ -157,6 +139,9 @@ const Census = ({ onComplete }) => {
   const [discountAddress, setDiscountAddress] = useState('');
   const [mintSuccess, setMintSuccess] = useState(false);
   const [mintData, setMintData] = useState(null);
+  const [hasMetamask, setHasMetamask] = useState(false);
+  const [hasSepoliaNetwork, setHasSepoliaNetwork] = useState(false);
+  const [hasBalance, setHasBalance] = useState(false);
 
   const handleSolanaSubmit = () => {
     // Simply move to next step
@@ -216,11 +201,43 @@ const Census = ({ onComplete }) => {
     }
   };
 
-  const progress = (step - 1) * 33.33;
+  const handleWalletConnect = async () => {
+    try {
+      const accounts = await window.ethereum.request({
+        method: 'eth_requestAccounts'
+      });
+      
+      if (accounts[0]) {
+        registerUser(accounts[0]);
+        setStep(2); // This will set progress to 33.33%
+      }
+    } catch (error) {
+      console.error('Error connecting wallet:', error);
+    }
+  };
+
+  const progress = ((step - 1) / 3) * 100;
+
+  // Check requirements on mount
+  useEffect(() => {
+    const checkRequirements = async () => {
+      setHasMetamask(!!window.ethereum);
+      // Check network and balance here
+    };
+    checkRequirements();
+  }, []);
+
+  // Debug log
+  console.log('Current user state:', user);
+  console.log('Current step:', step);
+  console.log('Current progress:', progress);
 
   return (
-    <CensusContainer>
-      <AsciiTitle>
+    <div className="relative">
+      {user && <UserHeader />}
+      
+      <CensusContainer>
+        <AsciiTitle>
 {`
    ▄████▄   ▓█████  ███▄    █   ██████  █    ██   ██████ 
   ▒██▀ ▀█   ▓█   ▀  ██ ▀█   █ ▒██    ▒  ██  ▓██▒▒██    ▒ 
@@ -230,25 +247,18 @@ const Census = ({ onComplete }) => {
   ░ ░▒ ▒  ░ ░░ ▒░ ░░ ▒░   ▒ ▒ ▒ ▒▓▒ ▒ ░░▒▓▒ ▒ ▒ ▒ ▒▓▒ ▒ ░
     ░  ▒     ░ ░  ░░ ░░   ░ ▒░░ ░▒  ░ ░░░▒░ ░ ░ ░ ░▒  ░ ░
 `}
-      </AsciiTitle>
+        </AsciiTitle>
 
-      <ProgressBarContainer>
-        <ProgressBar>
-          <Progress progress={progress} />
-        </ProgressBar>
-        <div style={{ 
-          textAlign: 'center', 
-          color: '#FF6B6B', 
-          fontFamily: 'monospace' 
-        }}>
-          {`[${Math.round(progress)}%]`}
-        </div>
-      </ProgressBarContainer>
+        <ProgressBarContainer>
+          <ProgressBar>
+            <Progress progress={mintSuccess ? 100 : progress} />
+          </ProgressBar>
+        </ProgressBarContainer>
 
-      {step === 1 && (
-        <StepContainer>
-          <StepTitle>
-            <AsciiTitle>
+        {step === 1 && (
+          <StepContainer>
+            <StepTitle>
+              <AsciiTitle>
 {`
   ╭──────────────────────╮
   │    JOIN COMMUNITY    │
@@ -257,23 +267,23 @@ const Census = ({ onComplete }) => {
      └─┐├┤  │ ├┤ ├─┘
      └─┘└─┘ ┴ └─┘┴  
 `}
-            </AsciiTitle>
-            <StepNumber>Step 1: Enter Your EVM Wallet</StepNumber>
-          </StepTitle>
-          <Input
-            type="text"
-            placeholder="Enter EVM Wallet Address"
-            value={data.evmWalletAddress}
-            onChange={(e) => setData({ ...data, evmWalletAddress: e.target.value })}
-          />
-          <Button onClick={handleSolanaSubmit}>Proceed</Button>
-        </StepContainer>
-      )}
+              </AsciiTitle>
+              <StepNumber>Step 1: Enter Your EVM Wallet</StepNumber>
+            </StepTitle>
+            <Input
+              type="text"
+              placeholder="Enter EVM Wallet Address"
+              value={data.evmWalletAddress}
+              onChange={(e) => setData({ ...data, evmWalletAddress: e.target.value })}
+            />
+            <Button onClick={handleSolanaSubmit}>Proceed</Button>
+          </StepContainer>
+        )}
 
-      {step === 2 && (
-        <StepContainer>
-          <StepTitle>
-            <AsciiTitle>
+        {step === 2 && (
+          <StepContainer>
+            <StepTitle>
+              <AsciiTitle>
 {`
   ╭────────────────────╮
   │  TELEGRAM CONNECT  │
@@ -282,35 +292,35 @@ const Census = ({ onComplete }) => {
     ░▒█░░ █▀▀▀ █   
     ░▒█░░ █▄▄▄ ▀▄▄
 `}
-            </AsciiTitle>
-            <StepNumber>Step 2: Join Telegram Channel</StepNumber>
-          </StepTitle>
-          <div style={{ marginBottom: '2rem' }}>
-            <a 
-              href="https://t.me/GENIS_AI" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              style={{
-                color: '#FF6B6B',
-                textDecoration: 'none',
-                fontFamily: 'Montserrat',
-                fontWeight: 'bold',
-                fontSize: '1.2rem'
-              }}
-            >
-              Join our Telegram Channel
-            </a>
-          </div>
-          <Button onClick={() => setStep(3)}>
-            Continue
-          </Button>
-        </StepContainer>
-      )}
+              </AsciiTitle>
+              <StepNumber>Step 2: Join Telegram Channel</StepNumber>
+            </StepTitle>
+            <div style={{ marginBottom: '2rem' }}>
+              <a 
+                href="https://t.me/GENIS_AI" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{
+                  color: '#DA498D',
+                  textDecoration: 'none',
+                  fontFamily: 'Montserrat',
+                  fontWeight: 'bold',
+                  fontSize: '1.2rem'
+                }}
+              >
+                Join our Telegram Channel
+              </a>
+            </div>
+            <Button onClick={() => setStep(3)}>
+              Continue
+            </Button>
+          </StepContainer>
+        )}
 
-      {step === 3 && (
-        <StepContainer>
-          <StepTitle>
-            <AsciiTitle>
+        {step === 3 && (
+          <StepContainer>
+            <StepTitle>
+              <AsciiTitle>
 {`
   ╭────────────────────╮
   │    GENIS PASS     │
@@ -322,84 +332,58 @@ const Census = ({ onComplete }) => {
     ██║ ╚████║██║        ██║   
     ╚═╝  ╚═══╝╚═╝        ╚═╝   
 `}
-            </AsciiTitle>
-            <StepNumber>Step 3: Connect & Mint</StepNumber>
-          </StepTitle>
+              </AsciiTitle>
+              <StepNumber>Step 3: Connect & Mint</StepNumber>
+            </StepTitle>
 
-          {!data.evmWalletAddress ? (
-            <Button 
-              onClick={async () => {
-                try {
-                  // Check if MetaMask is installed
-                  if (typeof window.ethereum === 'undefined') {
-                    window.open('https://metamask.io', '_blank');
-                    throw new Error('Please install MetaMask');
-                  }
+            {!data.evmWalletAddress ? (
+              <Button 
+                onClick={handleWalletConnect}
+              >
+                Connect Wallet
+              </Button>
+            ) : (
+              <Button 
+                onClick={handleNFTMint}
+                disabled={minting}
+              >
+                {minting ? 'Minting...' : 'Mint NFT'}
+              </Button>
+            )}
 
-                  // Request accounts with error handling
-                  const accounts = await window.ethereum.request({
-                    method: 'eth_requestAccounts',
-                  }).catch((err) => {
-                    if (err.code === 4001) {
-                      throw new Error('Please connect your wallet');
-                    } else {
-                      throw new Error('Error connecting wallet');
-                    }
-                  });
+            {data.evmWalletAddress && (
+              <div style={{ 
+                marginTop: '1rem',
+                fontFamily: 'Montserrat',
+                color: '#4CAF50',
+                fontSize: '0.9rem'
+              }}>
+                MON Address: {data.evmWalletAddress.slice(0, 6)}...{data.evmWalletAddress.slice(-4)}
+              </div>
+            )}
 
-                  if (accounts && accounts[0]) {
-                    setData({ ...data, evmWalletAddress: accounts[0] });
-                  }
-                } catch (error) {
-                  console.error('Wallet connection error:', error);
-                  setMintError(error.message);
-                }
-              }}
-            >
-              Connect Wallet
-            </Button>
-          ) : (
-            <Button 
-              onClick={handleNFTMint}
-              disabled={minting}
-            >
-              {minting ? 'Minting...' : 'Mint NFT'}
-            </Button>
-          )}
+            {mintError && (
+              <div style={{ 
+                color: '#DA498D', 
+                marginTop: '1rem',
+                fontFamily: 'Montserrat'
+              }}>
+                {mintError}
+              </div>
+            )}
 
-          {data.evmWalletAddress && (
-            <div style={{ 
-              marginTop: '1rem',
-              fontFamily: 'Montserrat',
-              color: '#4CAF50',
-              fontSize: '0.9rem'
-            }}>
-              Connected: {data.evmWalletAddress.slice(0, 6)}...{data.evmWalletAddress.slice(-4)}
-            </div>
-          )}
+            {mintSuccess && (
+              <MintSuccess 
+                tokenId={mintData.tokenId}
+                transactionHash={mintData.transaction}
+              />
+            )}
+          </StepContainer>
+        )}
 
-          {mintError && (
-            <div style={{ 
-              color: '#FF6B6B', 
-              marginTop: '1rem',
-              fontFamily: 'Montserrat'
-            }}>
-              {mintError}
-            </div>
-          )}
-
-          {mintSuccess && (
-            <MintSuccess 
-              tokenId={mintData.tokenId}
-              transactionHash={mintData.transaction}
-            />
-          )}
-        </StepContainer>
-      )}
-
-      {isCompleted && (
-        <XPReward>
-          <AsciiTitle>
+        {isCompleted && (
+          <XPReward>
+            <AsciiTitle>
 {`
     ██████╗ ██████╗ ███╗   ██╗ ██████╗ ██████╗  █████╗ ████████╗███████╗██╗
    ██╔════╝██╔═══██╗████╗  ██║██╔════╝ ██╔══██╗██╔══██╗╚══██╔══╝██╔════╝██║
@@ -408,22 +392,31 @@ const Census = ({ onComplete }) => {
    ╚██████╗╚██████╔╝██║ ╚████║╚██████╔╝██║  ██║██║  ██║   ██║   ███████║██╗
     ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝
 `}
-          </AsciiTitle>
-          <div className="points">+10,000 XP</div>
-          <div className="message">
-            We are proud of you for taking the first step towards better mental health!
-          </div>
-          <AsciiTitle style={{ marginTop: '1rem', fontSize: '0.6rem' }}>
+            </AsciiTitle>
+            <div className="points">+10,000 XP</div>
+            <div className="message">
+              We are proud of you for taking the first step towards better mental health!
+            </div>
+            <AsciiTitle style={{ marginTop: '1rem', fontSize: '0.6rem' }}>
 {`
     ╔═══════════════════════════════════════════╗
     ║             ACHIEVEMENT UNLOCKED           ║
     ║         ⭐ GENIS COMMUNITY MEMBER ⭐      ║
     ╚═══════════════════════════════════════════╝
 `}
-          </AsciiTitle>
-        </XPReward>
-      )}
-    </CensusContainer>
+            </AsciiTitle>
+          </XPReward>
+        )}
+
+        {step === 3 && ( // Show during mint step
+          <MintInstructions 
+            hasMetamask={hasMetamask}
+            hasSepoliaNetwork={hasSepoliaNetwork}
+            hasBalance={hasBalance}
+          />
+        )}
+      </CensusContainer>
+    </div>
   );
 };
 

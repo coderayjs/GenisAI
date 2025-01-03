@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { useState } from 'react';
 
 const InfoContainer = styled.div`
   position: fixed;
@@ -12,13 +13,13 @@ const InfoContainer = styled.div`
   max-width: 400px;
   border: 2px solid transparent;
   background-image: linear-gradient(white, white), 
-                    linear-gradient(45deg, #FF6B6B, #FF8E53);
+                    linear-gradient(45deg, #DA498D, #FF8E53);
   background-origin: border-box;
   background-clip: content-box, border-box;
 `;
 
 const AsciiHeader = styled.pre`
-  color: #FF6B6B;
+  color: #DA498D;
   font-size: 0.7rem;
   line-height: 1.2;
   margin-bottom: 1rem;
@@ -34,54 +35,84 @@ const LinkItem = styled.a`
   font-size: 0.9rem;
   
   &:hover {
-    color: #FF6B6B;
+    color: #DA498D;
     transform: translateX(5px);
   }
 `;
 
+const ToggleArrow = styled.button`
+  background: none;
+  border: none;
+  color: #DA498D;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.2);
+  }
+`;
+
+const LinksGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+`;
+
 const InfoLinks = () => {
+  const [isOpen, setIsOpen] = useState(true);
+
   return (
     <InfoContainer>
-      <AsciiHeader>
-{`
+      <ToggleArrow onClick={() => setIsOpen(!isOpen)}>
+        {isOpen ? '▼' : '▲'}
+      </ToggleArrow>
+
+      {isOpen && (
+        <LinksGrid>
+          <AsciiHeader>
+            {`
 ╔══════════════════════╗
 ║     GENIS LINKS     ║
 ╚══════════════════════╝
 `}
-      </AsciiHeader>
+          </AsciiHeader>
 
-      <LinkItem href="https://twitter.com/GENIS_AI" target="_blank">
-{`
+          <LinkItem href="https://twitter.com/GENIS_AI" target="_blank">
+            {`
 ┌─ TWITTER
 └─➤ @GENIS_AI
 `}
-      </LinkItem>
+          </LinkItem>
 
-      <LinkItem href="https://t.me/GENIS_AI" target="_blank">
-{`
+          <LinkItem href="https://t.me/GENIS_AI" target="_blank">
+            {`
 ┌─ TELEGRAM
-└─➤ @GENIS_AI
+└─➤ @Coming soon
 `}
-      </LinkItem>
+          </LinkItem>
 
-      <AsciiHeader>
-{`
+          <AsciiHeader>
+            {`
 ╔═════════════════════════╗
-║      CONTRACT ADDRESS     ║
+║      EVM ADDRESS     ║
 ╚═════════════════════════╝
 `}
-      </AsciiHeader>
+          </AsciiHeader>
 
-      <LinkItem 
-        href="https://solscan.io/token/your_contract_address" 
-        target="_blank"
-        style={{ wordBreak: 'break-all' }}
-      >
-{`
-┌─ SOLANA
+          <LinkItem
+            href="https://sepolia.etherscan.io/address/0x61bF02860d3de3979388aF215802381ff675e8b5"
+            target="_blank"
+            style={{ wordBreak: "break-all" }}>
+            {`
+┌─ MONAD DEVNET
 └─➤ Gn5...xyz
 `}
-      </LinkItem>
+          </LinkItem>
+        </LinksGrid>
+      )}
     </InfoContainer>
   );
 };

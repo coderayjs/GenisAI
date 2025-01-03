@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 const Button = styled.button`
   padding: 1rem 2rem;
-  background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+  background: linear-gradient(45deg, #DA498D, #FF8E53);
   color: white;
   border: none;
   border-radius: 50px;
@@ -41,7 +41,7 @@ const LoadingSpinner = styled.div`
   height: 50px;
   border: 3px solid rgba(255,255,255,.3);
   border-radius: 50%;
-  border-top-color: #FF6B6B;
+  border-top-color: #DA498D;
   animation: spin 1s ease-in-out infinite;
   
   @keyframes spin {
@@ -52,7 +52,7 @@ const LoadingSpinner = styled.div`
 const RewardContainer = styled.div`
   text-align: center;
   font-size: 2rem;
-  color: #FF6B6B;
+  color: #DA498D;
   margin: 2rem 0;
   animation: slideIn 1s ease;
   font-family: 'Montserrat', sans-serif;
@@ -81,6 +81,31 @@ const RewardContainer = styled.div`
   }
 `;
 
+const AudioControls = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+`;
+
+const AudioButton = styled.button`
+  padding: 0.5rem 1rem;
+  background: #DA498D;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    background: #FF8E53;
+  }
+`;
+
 const AIAdvice = ({ question, answer, onRewardEarned }) => {
   const [advice, setAdvice] = useState('');
   const [loading, setLoading] = useState(false);
@@ -89,33 +114,97 @@ const AIAdvice = ({ question, answer, onRewardEarned }) => {
   const generateAdvice = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8080/api/generate-advice', {
+      console.log('Attempting to connect to API...', {
+        question,
+        answer
+      });
+      
+      const response = await fetch('/api/generate-advice', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
         body: JSON.stringify({
           question,
-          answer,
+          answer
         }),
       });
+
+      console.log('API Response status:', response.status);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
-      setAdvice(data.advice);
-      setShowReward(true);
-      if (onRewardEarned) {
-        onRewardEarned(5000); // Reward 5000 XP for completing mental health check
+      console.log('API Response data:', data);
+
+      if (data.advice) {
+        setAdvice(data.advice);
+        setShowReward(true);
+        if (onRewardEarned) {
+          onRewardEarned(5000);
+        }
+      } else {
+        throw new Error('No advice received from API');
       }
     } catch (error) {
-      console.error('Error generating advice:', error);
-      setAdvice('Sorry, I had trouble generating advice. Please try again later.');
+      console.error('Error connecting to server:', error);
+      setAdvice('The AI service is currently unavailable. Please try again later.');
     }
     setLoading(false);
   };
+
+  const handleSpeak = () => {
+    // Get available voices
+    const voices = window.speechSynthesis.getVoices();
+    
+    // Find a female English voice (preferably Samantha or similar)
+    const femaleVoice = voices.find(voice => 
+      (voice.name.includes('Samantha') || 
+       voice.name.includes('Female') ||
+       voice.name.includes('Victoria')) && 
+      voice.lang.includes('en')
+    ) || voices[0]; // Fallback to first available voice
+
+    const utterance = new SpeechSynthesisUtterance(advice);
+    utterance.voice = femaleVoice;
+    utterance.rate = 0.9; // Slightly slower
+    utterance.pitch = 1.1; // Slightly higher pitch
+    utterance.volume = 1.0;
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const handleDownload = async () => {
+    try {
+      const response = await fetch('/api/text-to-speech', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: advice }),
+      });
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'advice.mp3';
+      a.click();
+    } catch (error) {
+      console.error('Error downloading audio:', error);
+    }
+  };
+
+  // Add voice loading on component mount
+  useEffect(() => {
+    // Load voices
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.getVoices();
+    };
+  }, []);
 
   return (
     <AdviceContainer>
@@ -124,6 +213,14 @@ const AIAdvice = ({ question, answer, onRewardEarned }) => {
       ) : advice ? (
         <>
           <AdviceText>{advice}</AdviceText>
+          <AudioControls>
+            <AudioButton onClick={handleSpeak}>
+              🔊 Play
+            </AudioButton>
+            <AudioButton onClick={handleDownload}>
+              ⬇️ Download MP3
+            </AudioButton>
+          </AudioControls>
           {showReward && (
             <RewardContainer>
                Mental Health Check Complete! 

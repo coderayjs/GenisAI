@@ -5,6 +5,7 @@ import Census from './components/Census';
 import { UserProvider, useUser } from './context/UserContext';
 import UserHeader from './components/UserHeader';
 import InfoLinks from './components/InfoLinks';
+import Footer from './components/Footer';
 
 const Container = styled.div`
   max-width: 1200px;
@@ -24,7 +25,7 @@ const Logo = styled.pre`
 
 const Button = styled.button`
   padding: 1rem 2rem;
-  background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+  background: linear-gradient(45deg, #DA498D, #FF8E53);
   color: white;
   border: none;
   border-radius: 50px;
@@ -100,7 +101,7 @@ const CensusPrompt = styled.div`
   margin: 2rem auto;
   border: 2px solid transparent;
   background-image: linear-gradient(white, white), 
-                    linear-gradient(45deg, #FF6B6B, #FF8E53);
+                    linear-gradient(45deg, #DA498D, #FF8E53);
   background-origin: border-box;
   background-clip: content-box, border-box;
 `;
@@ -121,7 +122,7 @@ const PromptDescription = styled.p`
   line-height: 1.6;
 
   span {
-    color: #FF6B6B;
+    color: #DA498D;
     font-weight: 600;
   }
 `;
@@ -137,6 +138,16 @@ const ButtonGroup = styled.div`
   }
 `;
 
+const PreviewText = styled.div`
+  margin: 1rem 0;
+  padding: 1rem;
+  background: rgba(255, 107, 107, 0.1);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+`;
+
 const AppContent = ({ children }) => {
   const [showQuestions, setShowQuestions] = useState(false);
   const [showCensusPrompt, setShowCensusPrompt] = useState(false);
@@ -147,7 +158,7 @@ const AppContent = ({ children }) => {
   const [currentAnswer, setCurrentAnswer] = useState('');
   const [currentQuestion, setCurrentQuestion] = useState('');
   
-  const { updateUserXP } = useUser();
+  const { updateUserXP, user } = useUser();
 
   const handleGetStarted = () => {
     setShowCensusPrompt(true);
@@ -184,10 +195,16 @@ const AppContent = ({ children }) => {
   };
 
   return (
-    <div style={{ backgroundColor: '#ffffff', color: '#333', lineHeight: 1.6 }}>
+    <>
       <UserHeader />
-      <Container style={{ marginTop: '80px' }}>
-        <Logo>
+      <div style={{ 
+        backgroundColor: '#ffffff', 
+        color: '#333', 
+        lineHeight: 1.6,
+        paddingTop: '80px'
+      }}>
+        <Container>
+          <Logo>
 {`
  ██████╗ ███████╗███╗   ██╗██╗███████╗     █████╗ ██╗
 ██╔════╗ ██╔════╝████╗  ██║██║██╔════╝    ██╔══██╗██║
@@ -197,82 +214,89 @@ const AppContent = ({ children }) => {
  ╚═════╝ ╚══════╝╚═╝  ╚═══╝╚═╝╚══════╝    ╚═╝  ╚═╝╚═╝
                     MENTAL HEALTH AI
 `}
-        </Logo>
+          </Logo>
 
-        <Description>
-          Welcome to GENIS, an AI-powered mental health awareness platform dedicated to helping men become better versions of themselves. 
-          We provide a safe, judgment-free space to discuss personal growth, emotional well-being, and mental health. 
-          Our goal is to break down stigmas and empower men to embrace vulnerability, seek support, and foster positive personal development.
-        </Description>
+          <Description>
+            Welcome to GENIS, an AI-powered mental health awareness platform dedicated to helping men become better versions of themselves. 
+            We provide a safe, judgment-free space to discuss personal growth, emotional well-being, and mental health. 
+            Our goal is to break down stigmas and empower men to embrace vulnerability, seek support, and foster positive personal development.
+          </Description>
 
-        {!showCensusPrompt && !showCensus && !showQuestions && (
-          <Button onClick={handleGetStarted}>
-            JOIN CENSUS
-          </Button>
-        )}
+          {!showCensusPrompt && !showCensus && !showQuestions && (
+            <Button onClick={handleGetStarted}>
+              JOIN CENSUS
+            </Button>
+          )}
 
-        {showCensusPrompt && (
-          <CensusPrompt>
-            <PromptTitle>Would you like to participate in our census?</PromptTitle>
-            <PromptDescription>
-              Complete the census to earn <span>10,000 XP</span> and join our community of mental health advocates!
-            </PromptDescription>
-            <ButtonGroup>
-              <Button onClick={() => handleCensusResponse('yes')}>Yes, I'm In!</Button>
-              <Button 
-                onClick={() => handleCensusResponse('no')}
-                style={{ 
-                  background: 'white',
-                  color: '#FF6B6B',
-                  border: '2px solid #FF6B6B'
-                }}
-              >
-                Maybe Later
+          {showCensusPrompt && (
+            <CensusPrompt>
+              <PromptTitle>Would you like to participate in our census?</PromptTitle>
+              <PromptDescription>
+                Complete the census to earn <span>10,000 XP</span> and join our community of mental health advocates!
+              </PromptDescription>
+              <ButtonGroup>
+                <Button onClick={() => handleCensusResponse('yes')}>Yes, I'm In!</Button>
+                <Button 
+                  onClick={() => handleCensusResponse('no')}
+                  style={{ 
+                    background: 'white',
+                    color: '#DA498D',
+                    border: '2px solid #DA498D'
+                  }}
+                >
+                  USE GENIS AI
+                </Button>
+              </ButtonGroup>
+            </CensusPrompt>
+          )}
+
+          {showCensus && (
+            <Census onComplete={handleCensusComplete} />
+          )}
+
+          {showQuestions && !showModal && (
+            <QuestionContainer>
+              <Button onClick={() => openModal("How do you feel about your mental health today?")}>
+                Mental Health Check-in
               </Button>
-            </ButtonGroup>
-          </CensusPrompt>
-        )}
+              <Button onClick={() => openModal("What's challenging you the most right now?")}>
+                Current Challenges
+              </Button>
+            </QuestionContainer>
+          )}
 
-        {showCensus && (
-          <Census onComplete={handleCensusComplete} />
-        )}
+          {showModal && (
+            <Modal>
+              <ModalContent>
+                <h2>{modalQuestion}</h2>
+                <Input 
+                  value={answer}
+                  onChange={(e) => setAnswer(e.target.value)}
+                  placeholder="Share your thoughts..."
+                />
+                {answer && (
+                  <PreviewText>
+                    Your response: {answer}
+                  </PreviewText>
+                )}
+                <Button onClick={handleSubmit}>Submit</Button>
+                <Button onClick={() => setShowModal(false)}>Close</Button>
+              </ModalContent>
+            </Modal>
+          )}
 
-        {showQuestions && !showModal && (
-          <QuestionContainer>
-            <Button onClick={() => openModal("How do you feel about your mental health today?")}>
-              Mental Health Check-in
-            </Button>
-            <Button onClick={() => openModal("What's challenging you the most right now?")}>
-              Current Challenges
-            </Button>
-          </QuestionContainer>
-        )}
-
-        {showModal && (
-          <Modal>
-            <ModalContent>
-              <h2>{modalQuestion}</h2>
-              <Input 
-                value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
-                placeholder="Share your thoughts..."
-              />
-              <Button onClick={handleSubmit}>Submit</Button>
-              <Button onClick={() => setShowModal(false)}>Close</Button>
-            </ModalContent>
-          </Modal>
-        )}
-
-        {currentAnswer && currentQuestion && (
-          <AIAdvice 
-            question={currentQuestion} 
-            answer={currentAnswer}
-            onRewardEarned={handleMentalHealthReward}
-          />
-        )}
-      </Container>
-      <InfoLinks />
-    </div>
+          {currentAnswer && currentQuestion && (
+            <AIAdvice 
+              question={currentQuestion} 
+              answer={currentAnswer}
+              onRewardEarned={handleMentalHealthReward}
+            />
+          )}
+        </Container>
+        <InfoLinks />
+        <Footer />
+      </div>
+    </>
   );
 };
 

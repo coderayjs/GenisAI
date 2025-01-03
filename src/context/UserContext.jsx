@@ -4,7 +4,6 @@ const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    // Check localStorage for existing user data
     const savedUser = localStorage.getItem('genisUser');
     return savedUser ? JSON.parse(savedUser) : null;
   });
@@ -19,6 +18,11 @@ export const UserProvider = ({ children }) => {
     localStorage.setItem('genisUser', JSON.stringify(userData));
   };
 
+  const disconnectUser = () => {
+    setUser(null);
+    localStorage.removeItem('genisUser');
+  };
+
   const updateUserXP = (points) => {
     if (user) {
       const updatedUser = {
@@ -31,7 +35,7 @@ export const UserProvider = ({ children }) => {
   };
 
   return (
-    <UserContext.Provider value={{ user, registerUser, updateUserXP }}>
+    <UserContext.Provider value={{ user, registerUser, updateUserXP, disconnectUser }}>
       {children}
     </UserContext.Provider>
   );

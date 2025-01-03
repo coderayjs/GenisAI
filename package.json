@@ -1,5 +1,5 @@
 {
-  "name": "penis-coin",
+  "name": "genis-ai",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -8,12 +8,13 @@
     "buffer": "^6.0.3",
     "cors": "^2.8.5",
     "cra-template": "1.2.0",
-    "express": "^4.21.2",
-    "openai": "^4.77.0",
+    "express": "^4.18.2",
+    "openai": "^3.2.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-scripts": "^5.0.1",
-    "styled-components": "^6.1.13"
+    "styled-components": "^6.1.13",
+    "dotenv": "^16.0.3"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -48,7 +49,6 @@
     "@openzeppelin/contracts": "^4.9.3",
     "chai": "^5.1.2",
     "concurrently": "^9.1.2",
-    "dotenv": "^16.4.7",
     "ethereum-waffle": "^4.0.10",
     "ethers": "^5.7.2",
     "hardhat": "^2.19.4"

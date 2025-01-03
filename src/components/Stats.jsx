@@ -18,13 +18,13 @@ const StatAscii = styled.pre`
   margin-bottom: 1rem;
   white-space: pre;
   font-family: monospace;
-  color: #FF6B6B;
+  color: #DA498D;
 `;
 
 const StatNumber = styled.div`
   font-size: 2.5rem;
   font-weight: bold;
-  color: #FF6B6B;
+  color: #DA498D;
 `;
 
 const StatLabel = styled.div`

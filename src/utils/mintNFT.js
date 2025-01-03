@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 
 // NFT Contract details
-const NFT_CONTRACT_ADDRESS = "0x7dE30C509208674E6a20D450cA04fEcac5daAD68";
+const NFT_CONTRACT_ADDRESS = "0xdEe25abC22a1dA0493B0EE7A02cEf21B102d81C5";
 const NFT_ABI = [
   {
     inputs: [],
@@ -558,8 +558,7 @@ const NFT_ABI = [
 const SEPOLIA_RPC = "https://eth-sepolia.g.alchemy.com/v2/rLKuFcZ7fSvflknt123WR-y4CSqnPB83";
 const CHAIN_ID = 11155111; // Sepolia chain ID
 
-// Add baseURI for metadata
-const BASE_URI = "https://raw.githubusercontent.com/coderayjs/GenisAI/master/metadata/";
+
 
 export const mintNFT = async () => {
   try {
@@ -567,13 +566,19 @@ export const mintNFT = async () => {
       throw new Error('Please install MetaMask');
     }
 
-    // Request network switch to Sepolia
+    // Request account access first
+    await window.ethereum.request({ 
+      method: 'eth_requestAccounts' 
+    });
+
+    // Then switch network
     try {
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: `0x${CHAIN_ID.toString(16)}` }],
       });
     } catch (switchError) {
+      // Handle network switch error
       if (switchError.code === 4902) {
         await window.ethereum.request({
           method: 'wallet_addEthereumChain',
@@ -590,26 +595,16 @@ export const mintNFT = async () => {
           }]
         });
       } else {
-        throw switchError;
+        console.error('Network switch failed:', switchError);
+        throw new Error('Please switch to Sepolia network in MetaMask');
       }
     }
 
-    // Use Web3Provider instead of JsonRpcProvider
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    await provider.send("eth_requestAccounts", []); // Request account access
     const signer = provider.getSigner();
+    const nftContract = new ethers.Contract(NFT_CONTRACT_ADDRESS, NFT_ABI, signer);
 
-    // Create contract instance with signer
-    const nftContract = new ethers.Contract(
-      NFT_CONTRACT_ADDRESS,
-      NFT_ABI,
-      signer
-    );
-
-    // Get mint price
     const mintPrice = await nftContract.MINT_PRICE();
-
-    // Mint NFT with proper value
     const tx = await nftContract.mint({ value: mintPrice });
     const receipt = await tx.wait();
 
@@ -623,7 +618,7 @@ export const mintNFT = async () => {
     console.error('Minting error:', error);
     return {
       success: false,
-      error: error.message
+      error: error.message || 'Minting failed'
     };
   }
 };
