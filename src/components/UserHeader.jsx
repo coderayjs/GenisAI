@@ -108,7 +108,7 @@ const UserHeader = () => {
         </WalletDisplay>
         
         <PoweredBy>
-          Developed Monad Devnet for <span>NADS</span>
+          Developed <span> MONAD💜 Community </span>
         </PoweredBy>
         
         <div style={{ display: 'flex', alignItems: 'center' }}>

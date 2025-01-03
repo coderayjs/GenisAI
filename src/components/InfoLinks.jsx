@@ -107,7 +107,7 @@ const InfoLinks = () => {
             target="_blank"
             style={{ wordBreak: "break-all" }}>
             {`
-┌─ MONAD DEVNET
+┌─ SEPOLIA ETHERSCAN
 └─➤ Gn5...xyz
 `}
           </LinkItem>
