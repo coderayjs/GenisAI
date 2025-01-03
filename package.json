@@ -3,23 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@nomiclabs/hardhat-ethers": "^2.2.3",
-    "@openzeppelin/contracts": "^5.1.0",
-    "@solana/spl-token": "^0.4.9",
-    "@solana/web3.js": "^1.98.0",
     "alchemy-sdk": "^3.5.0",
     "axios": "^1.7.9",
     "buffer": "^6.0.3",
     "cors": "^2.8.5",
     "cra-template": "1.2.0",
-    "dotenv": "^16.4.7",
-    "ethers": "^5.7.2",
     "express": "^4.21.2",
-    "hardhat": "^2.22.17",
     "openai": "^4.77.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-scripts": "5.0.1",
+    "react-scripts": "^5.0.1",
     "styled-components": "^6.1.13"
   },
   "scripts": {
@@ -50,6 +43,14 @@
   },
   "proxy": "http://localhost:8080",
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "@nomiclabs/hardhat-waffle": "^2.0.6",
+    "@openzeppelin/contracts": "^4.9.3",
+    "chai": "^5.1.2",
+    "concurrently": "^9.1.2",
+    "dotenv": "^16.4.7",
+    "ethereum-waffle": "^4.0.10",
+    "ethers": "^5.7.2",
+    "hardhat": "^2.19.4"
   }
 }
