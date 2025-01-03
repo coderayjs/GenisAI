@@ -5,6 +5,7 @@
   "dependencies": {
     "@solana/spl-token": "^0.4.9",
     "@solana/web3.js": "^1.98.0",
+    "alchemy-sdk": "^3.5.0",
     "axios": "^1.7.9",
     "buffer": "^6.0.3",
     "cors": "^2.8.5",

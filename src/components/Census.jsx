@@ -152,12 +152,12 @@ const Census = ({ onComplete }) => {
   const [verificationError, setVerificationError] = useState('');
   const [minting, setMinting] = useState(false);
   const [mintError, setMintError] = useState('');
+  const [isDiscounted, setIsDiscounted] = useState(false);
+  const [discountAddress, setDiscountAddress] = useState('');
 
   const handleSolanaSubmit = () => {
-    if (data.solanaAddress.length > 0) {
-      registerUser(data.solanaAddress);
-      setStep(2);
-    }
+    // Simply move to next step
+    setStep(2);
   };
 
   const handleTelegramSubmit = () => {
@@ -183,6 +183,38 @@ const Census = ({ onComplete }) => {
       setMintError(error.message);
     } finally {
       setMinting(false);
+    }
+  };
+
+  const handleDiscountCheck = async () => {
+    try {
+      // Check if MetaMask is installed
+      if (!window.ethereum) {
+        throw new Error('Please install MetaMask');
+      }
+
+      // Get connected wallet address
+      const accounts = await window.ethereum.request({ 
+        method: 'eth_requestAccounts' 
+      });
+      const userAddress = accounts[0];
+
+      // List of addresses eligible for discount
+      const discountAddresses = [
+        '0x123...', // Replace with actual addresses
+        '0x456...',
+        '0x789...'
+      ];
+
+      const hasDiscount = discountAddresses.includes(userAddress.toLowerCase());
+      setIsDiscounted(hasDiscount);
+      setDiscountAddress(userAddress);
+
+      return hasDiscount;
+    } catch (error) {
+      console.error('Discount check error:', error);
+      setMintError('Failed to check discount status');
+      return false;
     }
   };
 
@@ -221,22 +253,22 @@ const Census = ({ onComplete }) => {
             <AsciiTitle>
 {`
   ╭──────────────────────╮
-  │  CONNECT YOUR WALLET │
+  │    JOIN COMMUNITY    │
   ╰──────────────────────╯
      ┌─┐┌─┐┌┬┐┌─┐┌─┐
      └─┐├┤  │ ├┤ ├─┘
      └─┘└─┘ ┴ └─┘┴  
 `}
             </AsciiTitle>
-            <StepNumber>Step 1: Connect Your Solana Wallet</StepNumber>
+            <StepNumber>Step 1: Enter Your EVM Wallet</StepNumber>
           </StepTitle>
           <Input
             type="text"
-            placeholder="Enter Solana Address"
-            value={data.solanaAddress}
-            onChange={(e) => setData({ ...data, solanaAddress: e.target.value })}
+            placeholder="Enter EVM Wallet Address"
+            value={data.evmWalletAddress}
+            onChange={(e) => setData({ ...data, evmWalletAddress: e.target.value })}
           />
-          <Button onClick={handleSolanaSubmit}>Connect Wallet</Button>
+          <Button onClick={handleSolanaSubmit}>Proceed</Button>
         </StepContainer>
       )}
 
@@ -293,31 +325,61 @@ const Census = ({ onComplete }) => {
     ╚═╝  ╚═══╝╚═╝        ╚═╝   
 `}
             </AsciiTitle>
-            <StepNumber>Step 3: Mint NFT</StepNumber>
+            <StepNumber>Step 3: Connect & Mint</StepNumber>
           </StepTitle>
-          <div style={{ marginBottom: '1rem' }}>
-            <a 
-              href="#" 
-              onClick={(e) => {
-                e.preventDefault();
-                getSepoliaEth();
-              }}
-              style={{
-                color: '#FF6B6B',
-                textDecoration: 'none',
-                fontFamily: 'Montserrat',
-                fontWeight: 'bold'
+
+          {!data.evmWalletAddress ? (
+            <Button 
+              onClick={async () => {
+                try {
+                  // Check if MetaMask is installed
+                  if (typeof window.ethereum === 'undefined') {
+                    window.open('https://metamask.io', '_blank');
+                    throw new Error('Please install MetaMask');
+                  }
+
+                  // Request accounts with error handling
+                  const accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts',
+                  }).catch((err) => {
+                    if (err.code === 4001) {
+                      throw new Error('Please connect your wallet');
+                    } else {
+                      throw new Error('Error connecting wallet');
+                    }
+                  });
+
+                  if (accounts && accounts[0]) {
+                    setData({ ...data, evmWalletAddress: accounts[0] });
+                  }
+                } catch (error) {
+                  console.error('Wallet connection error:', error);
+                  setMintError(error.message);
+                }
               }}
             >
-              Get Sepolia ETH from Faucet
-            </a>
-          </div>
-          <Button 
-            onClick={handleNFTMint}
-            disabled={minting}
-          >
-            {minting ? 'Minting...' : 'Mint NFT'}
-          </Button>
+              Connect Wallet
+            </Button>
+          ) : (
+            <Button 
+              onClick={handleNFTMint}
+              disabled={minting}
+            >
+              {minting ? 'Minting...' : 'Mint NFT'}
+            </Button>
+          )}
+
+          {data.evmWalletAddress && (
+            <div style={{ 
+              marginTop: '1rem',
+              fontFamily: 'Montserrat',
+              color: '#4CAF50',
+              fontSize: '0.9rem'
+            }}>
+              Connected: {data.evmWalletAddress.slice(0, 6)}...{data.evmWalletAddress.slice(-4)}
+            </div>
+          )}
+
           {mintError && (
             <div style={{ 
               color: '#FF6B6B', 
