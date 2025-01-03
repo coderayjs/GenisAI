@@ -1,16 +1,20 @@
 const express = require('express');
 const OpenAI = require('openai');
 const cors = require('cors');
-require('dotenv').config({ path: '.env.local' });
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-console.log('API Key exists:', !!process.env.OPENAI_API_KEY);
+// Load API key from .env.local
+const envPath = path.join(__dirname, '.env.local');
+const envContent = fs.readFileSync(envPath, 'utf8');
+const apiKey = envContent.match(/OPENAI_API_KEY=(.*)/)[1].trim();
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: apiKey
 });
 
 app.post('/api/generate-advice', async (req, res) => {
@@ -42,7 +46,13 @@ app.post('/api/generate-advice', async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-}); 
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 8080;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+// For Vercel
+module.exports = app; 

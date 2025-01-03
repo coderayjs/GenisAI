@@ -119,7 +119,7 @@ const AIAdvice = ({ question, answer, onRewardEarned }) => {
         answer
       });
       
-      const response = await fetch('/api/generate-advice', {
+      const response = await fetch('https://genis-five.vercel.app/api/generate-advice', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
