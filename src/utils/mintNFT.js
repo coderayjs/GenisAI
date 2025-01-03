@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 
 // NFT Contract details
-const NFT_CONTRACT_ADDRESS = "0xAbEC1646E10a34fC7609DBb496F8e66849329f15";
+const NFT_CONTRACT_ADDRESS = "0x24c4b1Ee73f8391d09C50Cb46a898572ACE580Bf";
 const NFT_ABI = [
   {
     inputs: [],
@@ -559,7 +559,7 @@ const SEPOLIA_RPC = "https://eth-sepolia.g.alchemy.com/v2/rLKuFcZ7fSvflknt123WR-
 const CHAIN_ID = 11155111; // Sepolia chain ID
 
 // Add baseURI for metadata
-const BASE_URI = "https://your-metadata-server.com/metadata/";
+const BASE_URI = "https://raw.githubusercontent.com/coderayjs/GenisAI/master/metadata/";
 
 export const mintNFT = async () => {
   try {

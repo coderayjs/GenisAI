@@ -1,7 +1,7 @@
 {
     "name": "GENIS AI Pass",
     "description": "GENIS AI Community Pass",
-    "image": "https://raw.githubusercontent.com/coderayjs/GenisAI/master/genis-pass.png",
+    "image": "https://raw.githubusercontent.com/coderayjs/GenisAI/master/metadata/genis-pass.png",
     "attributes": [
         {
             "trait_type": "Type",
