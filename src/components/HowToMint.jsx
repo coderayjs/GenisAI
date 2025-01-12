@@ -27,7 +27,7 @@ const HowToMint = () => {
       <RequirementItem>
         {`
 ┌─ STEP 3
-└─➤ Connect EVM Wallet and Claim Pass`}
+└─➤ Connect EVM Wallet and mind Free Pass`}
       </RequirementItem>
 
       <AsciiHeader>
@@ -41,7 +41,7 @@ const HowToMint = () => {
       <RequirementItem>
         {`
 ┌─ PRICE
-└─➤ 0.25 DMON
+└─➤ FREE DMON
 `}
       </RequirementItem>
 
