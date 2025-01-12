@@ -1,0 +1,11 @@
+{
+    "name": "Gensis CARD",
+    "description": "Gensis CARD NFT for Monad Devnet RPC",
+    "image": "https://raw.githubusercontent.com/coderayjs/GenisAI/master/metadata/genisdevnet.png",
+    "attributes": [
+        {
+            "trait_type": "Series", 
+            "value": "Gensis CARD"
+        }
+    ]
+} 

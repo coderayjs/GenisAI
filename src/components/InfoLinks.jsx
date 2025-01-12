@@ -67,7 +67,7 @@ const InfoLinks = () => {
   return (
     <InfoContainer>
       <ToggleArrow onClick={() => setIsOpen(!isOpen)}>
-        {isOpen ? '▼' : '▲'}
+        {isOpen ? "▼" : "▲"}
       </ToggleArrow>
 
       {isOpen && (
@@ -103,11 +103,11 @@ const InfoLinks = () => {
           </AsciiHeader>
 
           <LinkItem
-            href="https://sepolia.etherscan.io/address/0x61bF02860d3de3979388aF215802381ff675e8b5"
+            href="https://explorer.monad-devnet.devnet101.com/"
             target="_blank"
             style={{ wordBreak: "break-all" }}>
             {`
-┌─ SEPOLIA ETHERSCAN
+┌─ $GENSIS TOKEN
 └─➤ Gn5...xyz
 `}
           </LinkItem>

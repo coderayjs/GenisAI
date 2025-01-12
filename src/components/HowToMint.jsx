@@ -5,33 +5,33 @@ const HowToMint = () => {
   return (
     <MintContainer>
       <AsciiHeader>
-{`
-╔════════════════════╗
-║  HOW TO MINT NFT   ║
-╚════════════════════╝
+        {`
+╔═══════════════════════════════╗
+║ HOW TO MINT A GENIS PASS      ║
+╚═══════════════════════════════╝
 `}
       </AsciiHeader>
 
       <RequirementItem>
-{`
+        {`
 ┌─ STEP 1
 └─➤ Complete Mental Health Check`}
       </RequirementItem>
 
       <RequirementItem>
-{`
+        {`
 ┌─ STEP 2
 └─➤ Earn Points Through Advice`}
       </RequirementItem>
 
       <RequirementItem>
-{`
+        {`
 ┌─ STEP 3
-└─➤ Connect MetaMask Wallet`}
+└─➤ Connect EVM Wallet and Claim Pass`}
       </RequirementItem>
 
       <AsciiHeader>
-{`
+        {`
 ╔═══════════════════╗
 ║   MINT DETAILS   ║
 ╚═══════════════════╝
@@ -39,23 +39,23 @@ const HowToMint = () => {
       </AsciiHeader>
 
       <RequirementItem>
-{`
+        {`
 ┌─ PRICE
-└─➤ 0.005 ETH
+└─➤ 0.25 DMON
 `}
       </RequirementItem>
 
       <RequirementItem>
-{`
+        {`
 ┌─ NETWORK
-└─➤ Sepolia Testnet
+└─➤ MONAD DEVNET
 `}
       </RequirementItem>
 
       <RequirementItem>
-{`
-┌─ GET TEST ETH
-└─➤ sepoliafaucet.com
+        {`
+┌─ GET DMON (MONAD DEVNET)
+└─➤ https://discord.gg/monaddev
 `}
       </RequirementItem>
     </MintContainer>

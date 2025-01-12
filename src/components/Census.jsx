@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { useState, useEffect } from 'react';
 import { useUser } from '../context/UserContext';
-import { mintNFT, getSepoliaEth } from '../utils/mintNFT';
+import { mintNFT } from '../utils/mintNFT';
 import MintSuccess from './MintSuccess';
 import MintInstructions from './MintInstructions';
 import UserHeader from './UserHeader';
@@ -130,28 +130,21 @@ const Census = ({ onComplete }) => {
     twitterHandle: '',
     nftMinted: false
   });
-  const [isCompleted, setIsCompleted] = useState(false);
-  const [verifying, setVerifying] = useState(false);
-  const [verificationError, setVerificationError] = useState('');
+  const [isCompleted] = useState(false);
   const [minting, setMinting] = useState(false);
   const [mintError, setMintError] = useState('');
-  const [isDiscounted, setIsDiscounted] = useState(false);
-  const [discountAddress, setDiscountAddress] = useState('');
+
   const [mintSuccess, setMintSuccess] = useState(false);
   const [mintData, setMintData] = useState(null);
   const [hasMetamask, setHasMetamask] = useState(false);
-  const [hasSepoliaNetwork, setHasSepoliaNetwork] = useState(false);
-  const [hasBalance, setHasBalance] = useState(false);
+  const [hasSepoliaNetwork] = useState(false);
+  const [hasBalance] = useState(false);
 
   const handleSolanaSubmit = () => {
     // Simply move to next step
     setStep(2);
   };
 
-  const handleTelegramSubmit = () => {
-    // Simply move to next step without verification
-    setStep(3);
-  };
 
   const handleNFTMint = async () => {
     try {
@@ -166,38 +159,6 @@ const Census = ({ onComplete }) => {
       setMintError(error.message);
     } finally {
       setMinting(false);
-    }
-  };
-
-  const handleDiscountCheck = async () => {
-    try {
-      // Check if MetaMask is installed
-      if (!window.ethereum) {
-        throw new Error('Please install MetaMask');
-      }
-
-      // Get connected wallet address
-      const accounts = await window.ethereum.request({ 
-        method: 'eth_requestAccounts' 
-      });
-      const userAddress = accounts[0];
-
-      // List of addresses eligible for discount
-      const discountAddresses = [
-        '0x123...', // Replace with actual addresses
-        '0x456...',
-        '0x789...'
-      ];
-
-      const hasDiscount = discountAddresses.includes(userAddress.toLowerCase());
-      setIsDiscounted(hasDiscount);
-      setDiscountAddress(userAddress);
-
-      return hasDiscount;
-    } catch (error) {
-      console.error('Discount check error:', error);
-      setMintError('Failed to check discount status');
-      return false;
     }
   };
 

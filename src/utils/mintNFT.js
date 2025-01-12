@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { ethers } from 'ethers/lib/ethers.js';
 
 // NFT Contract details
 const NFT_CONTRACT_ADDRESS = "0xdEe25abC22a1dA0493B0EE7A02cEf21B102d81C5";

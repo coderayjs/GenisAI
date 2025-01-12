@@ -7,7 +7,7 @@ const Footer = () => {
       <FooterContent>
         <FooterSection>
           <FooterTitle>GENIS AI</FooterTitle>
-          <FooterText>Mental health support powered by AI</FooterText>
+          <FooterText>Mental health support for web3 Users</FooterText>
         </FooterSection>
         
         <FooterSection>

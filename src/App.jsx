@@ -158,7 +158,7 @@ const AppContent = ({ children }) => {
   const [currentAnswer, setCurrentAnswer] = useState('');
   const [currentQuestion, setCurrentQuestion] = useState('');
   
-  const { updateUserXP, user } = useUser();
+  const { updateUserXP } = useUser();
 
   const handleGetStarted = () => {
     setShowCensusPrompt(true);
