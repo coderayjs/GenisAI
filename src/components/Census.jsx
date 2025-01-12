@@ -195,7 +195,6 @@ const Census = ({ onComplete }) => {
 
   return (
     <div className="relative">
-      {user && <UserHeader />}
       
       <CensusContainer>
         <AsciiTitle>
@@ -335,8 +334,8 @@ const Census = ({ onComplete }) => {
 
             {mintSuccess && (
               <MintSuccess 
-                tokenId={mintData.tokenId}
                 transactionHash={mintData.transaction}
+                tokenId={mintData.tokenId}
               />
             )}
           </StepContainer>

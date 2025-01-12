@@ -62,33 +62,33 @@ const MintInstructions = ({ hasMetamask = false, hasSepoliaNetwork = false, hasB
   return (
     <InstructionsContainer>
       <AsciiHeader>
-{`
+        {`
 ╔════════════════════╗
 ║  MINTING CHECKLIST ║
 ╚════════════════════╝
 `}
       </AsciiHeader>
 
-      <RequirementItem className={hasMetamask ? 'completed' : 'pending'}>
-{`
+      <RequirementItem className={hasMetamask ? "completed" : "pending"}>
+        {`
 ┌─ METAMASK
-└─➤ ${hasMetamask ? '✓ Installed' : '✗ Required'}`}
+└─➤ ${hasMetamask ? "✓ Installed" : "✗ Required"}`}
       </RequirementItem>
 
-      <RequirementItem className={hasSepoliaNetwork ? 'completed' : 'pending'}>
-{`
+      <RequirementItem className={hasSepoliaNetwork ? "completed" : "pending"}>
+        {`
 ┌─ NETWORK
-└─➤ ${hasSepoliaNetwork ? '✓ Sepolia' : '✗ Switch to Sepolia'}`}
+└─➤ ${hasSepoliaNetwork ? "✓ MONAD" : "✗ Switch to MONAD DEVNET"}`}
       </RequirementItem>
 
-      <RequirementItem className={hasBalance ? 'completed' : 'pending'}>
-{`
+      <RequirementItem className={hasBalance ? "completed" : "pending"}>
+        {`
 ┌─ BALANCE
-└─➤ ${hasBalance ? '✓ Sufficient' : '✗ Need Sepolia ETH'}`}
+└─➤ ${hasBalance ? "✓ Sufficient" : "✗ Need DEVNET DMON"}`}
       </RequirementItem>
 
       <AsciiHeader>
-{`
+        {`
 ╔═══════════════════╗
 ║   MINT DETAILS   ║
 ╚═══════════════════╝
@@ -96,24 +96,24 @@ const MintInstructions = ({ hasMetamask = false, hasSepoliaNetwork = false, hasB
       </AsciiHeader>
 
       <RequirementItem>
-{`
+        {`
 ┌─ PRICE
-└─➤ 0.005 ETH
+└─➤ FREE
 `}
       </RequirementItem>
 
       <RequirementItem>
-{`
+        {`
 ┌─ NETWORK
-└─➤ Sepolia Testnet
+└─➤ monad devnet v2
 `}
       </RequirementItem>
 
       {!hasBalance && (
         <RequirementItem>
-{`
-┌─ GET TEST ETH
-└─➤ sepoliafaucet.com
+          {`
+┌─ GET TEST MONAD
+└─➤ https://discord.gg/monaddev
 `}
         </RequirementItem>
       )}
